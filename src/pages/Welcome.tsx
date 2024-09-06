@@ -1,109 +1,85 @@
-import '../assets/styles/Welcome.css'
-import React, {useState } from 'react';
+// src/pages/Welcome.tsx
+import '../assets/styles/Welcome.css';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from './firebaseConfig';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { RootState } from '../store'; // Asegúrate de usar la ruta correcta
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../store/authActions'; // Acción para el login
 
 const Welcome: React.FC = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-   
-    const navigate = useNavigate();
+  // Estados para los inputs del formulario
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [formError, setFormError] = useState<string>('');
 
+  // Extraer el estado de autenticación desde Redux
+  const { isLoading, error } = useSelector((state: RootState) => state.auth);
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-  
-    const handleLogin = async (e) => {
-      e.preventDefault();
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        // Aquí puedes redirigir al usuario o hacer algo después del login
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-
-
-
-
-   // const { signIn } = UserAuth();
-
-
-
-
-
-
-/* 
-
-    const handleSubmit = async (e:any) => {
-        e.preventDefault();
-        // Validación del formato del correo electrónico
-        const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-        if (!emailRegex.test(emailRef.current.value)) {
-            setEmailError('El correo electrónico es inválido.');
-            return;
-        }
-        setEmailError('');
-        try {
-          //  await signIn(emailRef.current.value, passwordRef.current.value).then((response:any)=>{
-                navigate('/account')
-                sessionStorage.setItem('Auth Token', response._tokenResponse.refreshToken)
-            });
-        } catch (e:any)  {
-          if(e.code === 'auth/invalid-email'){
-            setError('El correo electrónico es inválido')
-          }else if(e.code === 'auth/user-not-found'){
-            setError('El usuario no existe')
-          }else if(e.code === 'auth/wrong-password'){
-            setError('La contraseña es incorrecta')
-          }else{
-            setError(e.message)
-          }
-        }
-    };
-     */
-  
-
+  // Manejar el envío del formulario
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      setFormError('Both email and password are required');
+      return;
+    }
+    
+    // Limpiar cualquier error previo y ejecutar el login
+    setFormError('');
+    dispatch(loginUser(email, password));
+  };
 
   return (
     <div className="full-screen-container">
-    <div className="login-container">
-      <h1 className="login-title">Dragones</h1>
-      <form className="form"/*  onSubmit={handleSubmit} */>
-        <div className="input-group success" >
-          <label htmlFor="email">Email</label>
-          <input type="email" name="email" id="email" ref={emailRef}/>
-          <span className="msg">Valid email</span>
-        </div>
+      <div className="login-container">
+        <h1 className="login-title">Dragones</h1>
+        
+        {/* Mostrar error de formulario si existe */}
+        {formError && <p className="error-message">{formError}</p>}
+        
+        {/* Mostrar error de login desde Redux si existe */}
+        {error && <p className="error-message">Login failed: {error}</p>}
+        
+        <form className="form" onSubmit={handleSubmit}>
+          {/* Grupo de entrada de correo */}
+          <div className={`input-group ${email ? 'success' : 'error'}`}>
+            <label htmlFor="email">Email</label>
+            <input 
+              type="email" 
+              name="email" 
+              id="email" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)} 
+              required
+            />
+            <span className="msg">{email ? 'Valid email' : 'Please enter your email'}</span>
+          </div>
 
-        <div className="input-group error" >
-          <label htmlFor="password">Password</label>
-          <input type="password" name="password" id="password" ref={passwordRef}/>
-          <span className="msg">Incorrect password</span>
-        </div>
+          {/* Grupo de entrada de contraseña */}
+          <div className={`input-group ${password ? 'success' : 'error'}`}>
+            <label htmlFor="password">Password</label>
+            <input 
+              type="password" 
+              name="password" 
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)} 
+              required 
+            />
+            <span className="msg">{password ? 'Password looks good' : 'Please enter your password'}</span>
+          </div>
 
-        <button type="submit" className="login-button">Login</button>
-      </form>
+          {/* Botón de login, deshabilitado si está cargando */}
+          <button type="submit" className="login-button" disabled={isLoading}>
+            {isLoading ? 'Loading...' : 'Login'}
+          </button>
+        </form>
+      </div>
     </div>
-  </div>
   );
 };
 
-export default Welcome; 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const Login = () => {
+export default Welcome;

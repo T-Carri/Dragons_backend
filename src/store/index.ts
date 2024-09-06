@@ -10,7 +10,7 @@ import {
     REGISTER,
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-
+import authReducer from './authSlice';
 
 const persistConfig = {
     key: 'verdefy',
@@ -20,8 +20,7 @@ const persistConfig = {
 
 // Combinar reductores
 const rootReducer = combineReducers({
-    /* youtubeSearch: youtubeSearchReducer,
-    stash: stashReducer, */
+    auth: authReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
