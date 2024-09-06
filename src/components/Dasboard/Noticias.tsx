@@ -18,6 +18,7 @@ function Noticias() {
   const [description, setDescription] = useState('');
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
 
+  
   useEffect(() => {
     const fetchImages = async () => {
       try {
