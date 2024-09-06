@@ -1,4 +1,3 @@
-// src/redux/authSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface AuthState {
@@ -17,20 +16,21 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    loginStart: (state) => {
+    loginStart(state) {
       state.isLoading = true;
-      state.error = null;
     },
-    loginSuccess: (state, action: PayloadAction<any>) => {
+    loginSuccess(state, action: PayloadAction<any>) {
       state.isLoading = false;
       state.user = action.payload;
+      state.error = null;
     },
-    loginFailure: (state, action: PayloadAction<string>) => {
+    loginFailure(state, action: PayloadAction<string>) {
       state.isLoading = false;
       state.error = action.payload;
     },
-    logout: (state) => {
+    logout(state) {
       state.user = null;
+      state.error = null;
     },
   },
 });
