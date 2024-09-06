@@ -19,4 +19,3 @@ export const logoutUser = () => async (dispatch:AppDispatch ) => {
   await signOut(auth);
   dispatch(logout());
 };
-
